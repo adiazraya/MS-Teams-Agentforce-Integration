@@ -1,0 +1,26 @@
+# Ignore single file
+config.json
+
+# Ignore file type
+*.log
+*.tmp
+
+# Ignore directory
+node_modules/
+dist/
+build/
+
+# Ignore files in any directory
+**/*.pyc
+**/.DS_Store
+
+# Ignore specific path
+src/config/local.json
+
+# Negate pattern (include file that would otherwise be ignored)
+!important.log
+
+# Ignore files with specific names in any directory
+**/temp/
+
+.env

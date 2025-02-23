@@ -76,10 +76,9 @@ const server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 
 server.post('/api/messages', async (req, res) => {
-    /* Microsoft teams does not implement Server Sent Events. If it would, the following sentence should be enough
-     ******    await adapter.process(req, res, botLogic);  *******
-    .... but as it does not.... we need the following code:
-    */
+    /* Microsoft teams does not implement Server Sent Events. 
+    I tried a workaround with the following code but it did not work.
+    ***************
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -129,7 +128,9 @@ server.post('/api/messages', async (req, res) => {
         }
     };
 
-    await adapter.process(req, res, botLogic2);
+     adapter.process(req, res, botLogic2);
+     */
+     await adapter.process(req, res, botLogic);
 });
 
 
