@@ -76,7 +76,62 @@ const server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 
 server.post('/api/messages', async (req, res) => {
-    await adapter.process(req, res, botLogic);
+    /* Microsoft teams does not implement Server Sent Events. If it would, the following sentence should be enough
+     ******    await adapter.process(req, res, botLogic);  *******
+    .... but as it does not.... we need the following code:
+    */
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    const botLogic = async (context) => {
+        if (context.activity.type === 'message') {
+            const userMessage = context.activity.text;
+            res.write(`data: "⏳ Processing your request..."\n\n`);
+
+            try {
+                const accessToken = await getSalesforceToken();
+                res.write(`data: "🔑 Salesforce token retrieved"\n\n`);
+
+                const sessionId = await createEinsteinSession(accessToken);
+                res.write(`data: "✅ Einstein AI session started"\n\n`);
+
+                const streamUrl = `${process.env.SF_MESSAGE_URL}/${sessionId}/messages/stream`;
+
+                const response = await axios({
+                    method: 'post',
+                    url: streamUrl,
+                    headers: {
+                        'Accept': 'text/event-stream',
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    data: {
+                        message: { sequenceId: Date.now(), type: "Text", text: userMessage },
+                        variables: []
+                    },
+                    responseType: 'stream'
+                });
+
+                response.data.on('data', (chunk) => {
+                    res.write(`data: ${chunk}\n\n`);
+                });
+
+                response.data.on('end', () => {
+                    res.write("event: done\n\n");
+                    res.end();
+                });
+
+            } catch (error) {
+                res.write(`data: "❌ Error: ${JSON.stringify(error.response?.data || error.message)}"\n\n`);
+                res.end();
+            }
+        }
+    };
+
+    adapter.process(req, res, botLogic);
+});
+
 });
 
 server.get('/api/messages/stream', async (req, res) => {
