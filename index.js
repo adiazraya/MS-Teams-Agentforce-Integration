@@ -84,7 +84,7 @@ server.post('/api/messages', async (req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    const botLogic = async (context) => {
+    const botLogic2 = async (context) => {
         if (context.activity.type === 'message') {
             const userMessage = context.activity.text;
             res.write(`data: "⏳ Processing your request..."\n\n`);
@@ -129,7 +129,7 @@ server.post('/api/messages', async (req, res) => {
         }
     };
 
-    adapter.process(req, res, botLogic);
+    await adapter.process(req, res, botLogic2);
 });
 
 
