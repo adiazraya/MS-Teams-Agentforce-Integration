@@ -132,7 +132,6 @@ server.post('/api/messages', async (req, res) => {
     adapter.process(req, res, botLogic);
 });
 
-});
 
 server.get('/api/messages/stream', async (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
