@@ -5,7 +5,7 @@ const { CloudAdapter, ConfigurationServiceClientCredentialFactory, Configuration
 
 // Session management variables
 const sessionCache = new Map(); // Map to store sessions by conversationId
-const SESSION_TIMEOUT = process.env.MIN_SESSION||30 * 60 * 1000; // 30 minutes timeout (adjust as needed)
+const SESSION_TIMEOUT = (process.env.MIN_SESSION || 30) * 60 * 1000; // 30 minutes timeout (adjust as needed)
 
 const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
     MicrosoftAppId: process.env.BOT_ID,
@@ -97,7 +97,7 @@ const botLogic = async (context) => {
         const conversationId = context.activity.conversation.id;
         
         console.log(`📩 Message received from conversation ${conversationId}:`, context.activity.text);
-        await context.sendActivity("⏳ "+process.env.STATUS_MESSAGE||"Processing your request...");
+        await context.sendActivity("⏳ "+(process.env.STATUS_MESSAGE || "Processing your request..."));
         
         try {
             const accessToken = await getSalesforceToken();
